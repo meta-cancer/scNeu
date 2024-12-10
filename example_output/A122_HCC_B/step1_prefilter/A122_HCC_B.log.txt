@@ -1,0 +1,2 @@
+process	name	totalCell	Cant	HQcell	Neu	Neu.pct
+1	seurat_prefilter	A122_HCC_B	9802	23	6844	6844	69.82
