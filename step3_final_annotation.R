@@ -1,4 +1,4 @@
-cat("<<<scNeu: A tool for identify neutrophils from single-cell data>>>")
+cat("<<<scNeu: A pipeline for identify neutrophils from single-cell data>>>")
 library(BiocParallel)
 library(Seurat)
 library(SeuratObject)

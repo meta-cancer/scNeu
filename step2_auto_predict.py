@@ -125,7 +125,7 @@ def fitSVM_CPU(file_path,model_path,scaler_path):
         return y_pred,None
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="<<<scNeu: A tool for identify neutrophils from single-cell data>>>")
+    parser = argparse.ArgumentParser(description="<<<scNeu: A pipeline for identify neutrophils from single-cell data>>>")
     # 定义参数
     parser.add_argument("-s", "--sample", required=True, help="Sample name or ID")
     parser.add_argument("-i", "--input_path", required=True, help="Input data dir path ")
