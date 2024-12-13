@@ -1,4 +1,4 @@
-# required: mamba activate scNeu
+# required: mamba activate scNeu or using singularity
 import argparse
 import configparser
 import os
