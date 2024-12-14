@@ -1,0 +1,76 @@
+Bootstrap: docker
+From: nvidia/cuda:11.8.0-base-ubuntu22.04
+
+%files
+scNeu_env.tar /opt/scNeu_env.tar
+/0.db/Pan/scNeu/ /scNeu
+
+%post
+# 安装 HTTPS 证书支持
+apt-get update && apt-get install -y ca-certificates
+
+# 更新apt源
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse" > /etc/apt/sources.list
+echo "deb http://security.ubuntu.com/ubuntu/ jammy-security main universe multiverse restricted" >> /etc/apt/sources.list
+apt-get update && apt-get upgrade -y
+
+# 解压scNeu的conda环境
+mkdir -p /opt/scNeu
+tar -xf /opt/scNeu_env.tar -C /opt/scNeu
+rm /opt/scNeu_env.tar
+export PATH=/opt/scNeu/bin:$PATH
+/opt/scNeu/bin/conda-unpack
+
+# scNeu代码和样例
+chmod +x /scNeu/*.{sh,py,R} || true
+
+# 快捷访问设置
+ln -s /scNeu/step1_raw_prefilter.R /usr/local/bin/step1_raw_prefilter.R
+ln -s /scNeu/step2_auto_predict.py /usr/local/bin/step2_auto_predict.py
+ln -s /scNeu/step3_final_annotation.R /usr/local/bin/step3_final_annotation.R
+chmod +x /usr/local/bin/step1_raw_prefilter.R /usr/local/bin/step2_auto_predict.py /usr/local/bin/step3_final_annotation.R
+
+# 配置环境变量
+echo "export PATH=/opt/scNeu/bin:/usr/local/bin:\$PATH" >> /environment
+echo "export CONDA_PREFIX=/opt/scNeu" >> /environment
+echo "export CONDA_DEFAULT_ENV=scNeu" >> /environment
+echo "export PYTHONPATH=/opt/scNeu/lib/python3.8/site-packages" >> /environment
+echo "export R_HOME=/opt/scNeu/lib/R" >> /environment
+echo "export R_LIBS=/opt/scNeu/lib/R/library" >> /environment
+
+# 安装基础依赖
+apt-get update && apt-get install -y \
+    libtiff5 \
+    libjpeg-dev \
+    libpng-dev \
+    locales \
+    libopenblas-dev \
+    libgomp1 \
+    libxml2 \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    && apt-get clean
+
+# 设置 UTF-8 支持, 避免 R 和 Python 因 locale 报错
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8
+
+# 验证 Python 和 R
+/opt/scNeu/bin/python --version || echo "Python not properly installed!"
+/opt/scNeu/bin/R --version || echo "R not properly installed!"
+
+# 清理缓存，减少镜像大小
+apt-get clean && rm -rf /var/lib/apt/lists/*
+
+%environment
+export PATH=/opt/scNeu/bin:$PATH
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# 配置 NVIDIA 环境变量
+export NVIDIA_VISIBLE_DEVICES=all
+export NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+%help
+This Singularity container includes the scNeu environment with GPU support. Built on Ubuntu 22.04.
