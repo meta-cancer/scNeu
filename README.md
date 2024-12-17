@@ -13,12 +13,12 @@ scNeu pipeline includes three steps:
 Define variables and input-output paths here:
 
 ```
-i="sample_name"						# input sample name
+i="sample_name"					# input sample name
 software="/path/to/scNeu/"  		# Pipeline script path
 sif_path="/path/to/scNeu.sif"  		# Singularity image container file location (download from release page)
 inPth="/path/to/example_rawdata/"	# Directory output by 10X cellranger (use raw matrix)
 outPth="/path/to/example_output/"	# Select the directory for algorithm output
-useGPU=True							# Choose whether to use GPU to accelerate computation(True or False)
+useGPU=True					# Choose whether to use GPU to accelerate computation(True or False)
 ```
 
 ### Step1: Prefilter from 10X genomics single-cell raw matrix (in R)
