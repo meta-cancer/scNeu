@@ -4,9 +4,22 @@ Neutrophils are the most abundant leukocytes in human blood and are essential co
 
 scNeu provides a comprehensive tool for identify neutrophils from 10X Genomics single-cell data.
 
+![Figure1](./PipelineOverview_scNeu.png)
+
 ## Pipeline Overview
 
 scNeu pipeline includes three steps:
+
+Define variables and input-output paths here:
+
+```
+i="sample_name"  					# input sample name
+software="/path/to/scNeu/"  		# Pipeline script path
+sif_path="/path/to/scNeu.sif"  		# Singularity image container file location (download from release page)
+inPth="/path/to/example_rawdata/"	# Directory output by 10X cellranger (use raw matrix)
+outPth="/path/to/example_output/"	# Select the directory for algorithm output
+useGPU=True 						# Choose whether to use GPU to accelerate computation(True or False)
+```
 
 ### Step1: Prefilter from 10X genomics single-cell raw matrix (in R)
 
@@ -48,6 +61,10 @@ singularity exec --nv \
     ${sif_path} \
     Rscript /scNeu/step3_final_annotation.R ${i} ${outPth}${i}/step1_prefilter ${outPth}${i}/step3_annotation ${outPth}${i}/step2_predict ${outPth}${i} ${software}
 ```
+
+Detail for three steps:
+
+![Figure1](./PipelineOverview_2.png)
 
 Please cite:
 
@@ -100,12 +117,12 @@ Here are two usages of this pipelines: singularity and conda/mamba environment.
            --bind ${outPth}:${outPth} \
            ${sif_path} \
            python /scNeu/step2_auto_predict.py -s ${i} \
-           -i ${outPth}${i}/step1_prefilter \
-           -o ${outPth}${i}/step2_predict \
-   		--model /scNeu/model.joblib \
-   		--scaler /scNeu/scaler.joblib \
-   		--geneList /scNeu/geneList.csv \
-   		--usegpu ${useGPU}
+               -i ${outPth}${i}/step1_prefilter \
+               -o ${outPth}${i}/step2_predict \
+               --model /scNeu/model.joblib \
+               --scaler /scNeu/scaler.joblib \
+               --geneList /scNeu/geneList.csv \
+               --usegpu ${useGPU}
    
    	### step3：perform final annotations ####
    	echo "!!!!!!!!!!!!!! "${i}": Step3__Perform final annotations !!!!!!!!!!!!!!!!!!!"
@@ -191,12 +208,12 @@ Here are two usages of this pipelines: singularity and conda/mamba environment.
    	echo "!!!!!!!!!!!!!! "${i}": Step2__Process and predict !!!!!!!!!!!!!!!!!!!"
    	mkdir -p ./step2_predict
    	python ${software}step2_auto_predict.py -s ${i} \
-   	-i ${outPth}${i}/step1_prefilter \
-   	-o ${outPth}${i}/step2_predict \
-   	--model ${model} \
-   	--scaler ${scaler} \
-   	--geneList ${geneList} \
-   	--usegpu ${useGPU}
+           -i ${outPth}${i}/step1_prefilter \
+           -o ${outPth}${i}/step2_predict \
+           --model ${model} \
+           --scaler ${scaler} \
+           --geneList ${geneList} \
+           --usegpu ${useGPU}
    
    	### step3：perform final annotations ####
    	echo "!!!!!!!!!!!!!! "${i}": Step3__Perform final annotations !!!!!!!!!!!!!!!!!!!"
